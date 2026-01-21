@@ -17,16 +17,15 @@ A Kubernetes-based AI/MLOps platform designed for:
 | Node 1 | NVIDIA RTX 5090 | GPU Worker |
 | Node 2 | NVIDIA RTX 4090 | GPU Worker |
 
-**Kubernetes Version**: v1.35.0
+**Kubernetes Version**: v1.34.1
 
 ## Components
 
 | Component | Version | Purpose |
 |-----------|---------|---------|
 | NVIDIA Device Plugin | v0.18.1 | GPU resource management |
-| Volcano | latest | Gang scheduling for distributed workloads |
-| KubeRay Operator | v0.9.0 | Ray cluster orchestration |
-| KServe | latest | Model inference serving |
+| Kueue | 0.15.2 | Gang scheduling for distributed workloads |
+| KubeRay Operator | v1.5.1 | Ray cluster orchestration |
 | Gateway API | v1.1.0 | Advanced traffic routing |
 | Prometheus + DCGM Exporter | latest | GPU metrics and monitoring |
 
@@ -96,7 +95,7 @@ kubectl logs gpu-test
 | Accelerator Metrics | ✅ Pass |
 | Dynamic Resource Allocation | ✅ Pass |
 | Cluster Autoscaling | N/A |
-| HPA for AI Workloads | N/A |
+| HPA for AI Workloads |  ✅ Pass |
 
 ## License
 
