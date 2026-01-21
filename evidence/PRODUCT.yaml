@@ -52,7 +52,7 @@ spec:
     - id: pod_autoscaling
       description: "If the platform supports the HorizontalPodAutoscaler, it must function correctly for pods utilizing accelerators. This includes the ability to scale these Pods based on custom metrics relevant to AI/ML workloads."
       level: MUST
-      status: "N/A"
+      status: "Implemented"
       evidence:
         - "https://github.com/mensylisir/taichu-ai/blob/master/docs/pod_autoscaling.md"
       notes: ""
