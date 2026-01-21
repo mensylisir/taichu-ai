@@ -2,16 +2,16 @@
 # Kubernetes Version: v1.35
 
 metadata:
-  kubernetesVersion: v1.35
-  platformName: "<PLACEHOLDER: Your Platform Name>"
-  platformVersion: "<PLACEHOLDER: e.g., v1.0.0>"
-  vendorName: "<PLACEHOLDER: Your Organization Name>"
-  website_url: "<PLACEHOLDER: https://your-platform.example.com>"
-  repo_url: "https://github.com/<your-org>/kubernetes-ai-conformance"
-  documentation_url: "https://github.com/<your-org>/kubernetes-ai-conformance/tree/main/docs"
-  product_logo_url: "<PLACEHOLDER: https://your-cdn.example.com/logo.svg>"
-  description: "Kubernetes-based AI/MLOps platform with GPU acceleration support for distributed training and inference workloads."
-  contact_email_address: "<PLACEHOLDER: conformance@your-org.example.com>"
+  kubernetesVersion: v1.33
+  platformName: "Taichu Kubernetes Service"
+  platformVersion: "v1.12.0"
+  vendorName: "Xi'an TieKe Jingwei Information Technology Co.,Ltd."
+  website_url: "https://www.rails.cn/xian/en-us/src/prointroduce/kmpp"
+  repo_url: "https://github.com/mensylisir/taichu-ai"
+  documentation_url: "https://github.com/mensylisir/taichu-ai/tree/master/docs"
+  product_logo_url: "https://www.rails.cn/xian/assets/static/logo1.179003c.2b0dfa30eeb2a44c4d53445a8da814de.svg"
+  description: "TaiChu kubernetes engine provie an easier,powerful platform that helps enterprise to use Kubernetes faster and better, include but not limited to installation and maintenance of k8s, deployment, monitoring and management of containerized applications,etc."
+  contact_email_address: "whoisfisher@163.com"
 
 spec:
   accelerators:
@@ -20,8 +20,8 @@ spec:
       level: MUST
       status: "Implemented"
       evidence:
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/architecture.md#6-dynamic-resource-allocation-dra"
-      notes: "DRA APIs enabled via Kubernetes feature gates. ResourceClaims used for GPU allocation."
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/dra_support.md"
+      notes: "DRA API is enabled in Kubernetes 1.34 by default"
 
   networking:
     - id: ai_inference
@@ -29,9 +29,8 @@ spec:
       level: MUST
       status: "Implemented"
       evidence:
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/gateway-api.md"
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/examples/inference-gateway/"
-      notes: "Gateway API v1.1.0 installed with HTTPRoute support for weighted traffic splitting and header-based routing."
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/ai_inference.md"
+      notes: ""
 
   schedulingOrchestration:
     - id: gang_scheduling
@@ -39,23 +38,24 @@ spec:
       level: MUST
       status: "Implemented"
       evidence:
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/scheduling.md"
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/manifests/volcano/"
-      notes: "Volcano scheduler deployed for gang scheduling of distributed AI workloads."
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/gang_scheduling.md"
+      notes: ""
 
     - id: cluster_autoscaling
       description: "If the platform provides a cluster autoscaler or an equivalent mechanism, it must be able to scale up/down node groups containing specific accelerator types based on pending pods requesting those accelerators."
       level: MUST
       status: "N/A"
-      evidence: []
-      notes: "Platform does not provide cluster autoscaling. GPU nodes are statically provisioned bare-metal nodes (NVIDIA RTX 5090, RTX 4090)."
+      evidence:
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/cluster_autoscaling.md"
+      notes: ""
 
     - id: pod_autoscaling
       description: "If the platform supports the HorizontalPodAutoscaler, it must function correctly for pods utilizing accelerators. This includes the ability to scale these Pods based on custom metrics relevant to AI/ML workloads."
       level: MUST
       status: "N/A"
-      evidence: []
-      notes: "HPA for AI workloads is not provided in the current platform scope. Standard metrics-server is available for basic HPA."
+      evidence:
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/pod_autoscaling.md"
+      notes: ""
 
   observability:
     - id: accelerator_metrics
@@ -63,17 +63,16 @@ spec:
       level: MUST
       status: "Implemented"
       evidence:
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/monitoring.md"
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/manifests/prometheus/"
-      notes: "NVIDIA DCGM Exporter deployed for GPU metrics. Prometheus scrapes GPU utilization, memory usage, and temperature metrics."
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/accelerator_metrics.md"
+      notes: ""
 
     - id: ai_service_metrics
       description: "Provide a monitoring system capable of discovering and collecting metrics from workloads that expose them in a standard format (e.g. Prometheus exposition format)."
       level: MUST
       status: "Implemented"
       evidence:
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/monitoring.md"
-      notes: "Prometheus Operator deployed with ServiceMonitor support for AI workload metrics discovery."
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/ai_service_metrics.md"
+      notes: ""
 
   security:
     - id: secure_accelerator_access
@@ -81,9 +80,8 @@ spec:
       level: MUST
       status: "Implemented"
       evidence:
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/gpu.md"
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/architecture.md#13-accelerator-isolation"
-      notes: "GPU access controlled via NVIDIA device plugin (v0.18.1) and containerd runtime isolation. No direct host GPU access permitted."
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/secure_accelerator_access.md"
+      notes: ""
 
   operator:
     - id: robust_controller
@@ -91,7 +89,5 @@ spec:
       level: MUST
       status: "Implemented"
       evidence:
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/architecture.md#14-complex-ai-operator-validation"
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/manifests/ray/"
-        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/examples/ray-gpu-job/"
-      notes: "KubeRay Operator (v0.9.0) installed with CRDs, controller pods, and webhooks verified. RayCluster and RayJob resources reconcile successfully."
+        - "https://github.com/mensylisir/taichu-ai/blob/master/docs/robust_controller.md"
+      notes: ""
