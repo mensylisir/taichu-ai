@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 10
+  labels:
+    app: nginx
+  name: gpu-test2
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - image: nvcr.io/nvidia/pytorch:25.09-py3
+          imagePullPolicy: Always
+          name: nginx
+          command: ["/bin/bash", "-c", "--"]
+          args: ["while true; do sleep 30; done;"]
+          resources:
+            limits:
+              cpu: "4"
+              memory: 10Gi
+              nvidia.com/gpu: "2"
+            requests:
+              cpu: "4"
+              memory: 10Gi
+              nvidia.com/gpu: "2"
+      nodeSelector:
+        kubernetes.io/hostname: ai18
+      restartPolicy: Always
+      tolerations:
+        - effect: NoSchedule
+          key: app
+          operator: Equal
+          value: gpu

@@ -26,12 +26,17 @@ resourceslices                        resource.k8s.io/v1   false        Resource
 ```
 
 ## Install NVIDIA GPU Operator
+
+1. Install NVIDIA GPU Operator using Helm
+
 ```bash
 helm install gpu-operator gpu-operator --repo https://helm.ngc.nvidia.com/nvidia --version v25.3.3 -n gpu-operator --create-namespace
 ```
 
+2. Verify the installation
+
 ```bash
-(base) root@ai18:~/wode/gateway-helm/k8s-dra-driver-gpu# kubectl -n gpu-operator  get pod
+(base) root@ai18:~/wode/gpu-operator# kubectl -n gpu-operator  get pod
 NAME                                                          READY   STATUS      RESTARTS   AGE
 gpu-feature-discovery-4cg7l                                   1/1     Running     0          54m
 gpu-feature-discovery-hl89d                                   1/1     Running     0          54m
@@ -50,7 +55,57 @@ nvidia-device-plugin-daemonset-bw66f                          1/1     Running   
 nvidia-device-plugin-daemonset-jhmls                          1/1     Running     0          54m
 nvidia-operator-validator-sz5ch                               1/1     Running     0          54m
 nvidia-operator-validator-tbfj8                               1/1     Running     0          54m
-(base) root@ai18:~/wode/gateway-helm/k8s-dra-driver-gpu# 
+(base) root@ai18:~/wode/gpu-operator# 
+
+```
+
+3. Create configmap
+
+```
+kubectl apply -n gpu-operator -f - <<eof
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: device-plugin-config
+  namespace: gpu-operator
+data:
+  config.yaml: |-
+    version: v1
+    sharing:
+      timeSlicing:
+        resources:
+        - name: nvidia.com/gpu
+          replicas: 4
+eof
+```
+
+4. Patch the clusterpolicy
+
+```
+kubectl patch clusterpolicy cluster-policy \
+    --type merge \
+    -p '{"spec": {"devicePlugin": {"config": {"name": "device-plugin-config", "default": "config.yaml"}}}}'
+```
+
+5. Verify node resources
+
+```
+Capacity:
+  cpu:                20
+  ephemeral-storage:  958827632Ki
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             65579888Ki
+  nvidia.com/gpu:     4
+  pods:               110
+Allocatable:
+  cpu:                20
+  ephemeral-storage:  883655544189
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             65272688Ki
+  nvidia.com/gpu:     4
+  pods:               110
 
 ```
 
