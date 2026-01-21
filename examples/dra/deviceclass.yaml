@@ -1,0 +1,11 @@
+apiVersion: resource.k8s.io/v1
+kind: DeviceClass
+metadata:
+  name: mygpu
+spec:
+  selectors:
+  - cel:
+      expression: |
+        device.driver == 'gpu.nvidia.com'
+        && device.attributes['gpu.nvidia.com'].type == 'gpu'
+        && device.attributes['gpu.nvidia.com'].memory >= 24000

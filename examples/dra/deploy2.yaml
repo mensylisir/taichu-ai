@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pytorch-cuda-check1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pytorch-cuda-check1
+  template:
+    metadata:
+      labels:
+        app: pytorch-cuda-check1
+    spec:
+      containers:
+        - name: pytorch-cuda-check1
+          image: easzlab.io.local:5000/nvidia/pytorch:25.09-py3
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              while true; do
+                python3 -c "import torch; print(torch.cuda.device_count())"
+                sleep 30
+              done
+          resources:
+            claims:
+              - name: req0
+      resourceClaims:
+        - name: req0
+          resourceClaimTemplateName: gpu-claim-template2

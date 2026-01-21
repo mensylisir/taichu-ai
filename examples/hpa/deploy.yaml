@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hpa-test
+  namespace: ha-test-namespace
+  labels:
+    taichu.io/app-name: hpa-test
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 9600
+  selector:
+    matchLabels:
+      app: hpa-test
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "8000"
+        prometheus.io/scrape: "true"
+      labels:
+        app: hpa-test
+    spec:
+      containers:
+        - name: custom-container
+          image: docker.io/vllm/vllm-openai:v0.11.0
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -c
+            - python3 -m vllm.entrypoints.openai.api_server --port 8000 --model /vllm-workspace/models/qwen/Qwen3-8B
+              --tensor-parallel-size 1 --pipeline-parallel-size 1 --gpu-memory-utilization
+              0.7 --max_model_len 4096 --served-model-name Qwen3-8B --trust-remote-code
+          env:
+            - name: VLLM_NODE
+              value: "1"
+            - name: AIHC_RESOURCE_FROM
+              value: aihcpom
+            - name: AIHC_APP
+              value: hpa-test
+            - name: AIHC_X_Region
+              value: bj
+          ports:
+            - name: port-8000
+              containerPort: 8000
+              protocol: TCP
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+              cpu: "4"
+              memory: 16Gi
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 6
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sleep
+                  - "30"
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+          volumeMounts:
+            - name: model-volume
+              mountPath: /vllm-workspace/models
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: model-volume
+          hostPath:
+            path: /vllm-workspace/models
+            type: Directory

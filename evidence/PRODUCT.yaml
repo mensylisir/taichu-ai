@@ -1,0 +1,97 @@
+# CNCF Kubernetes AI Conformance Submission
+# Kubernetes Version: v1.35
+
+metadata:
+  kubernetesVersion: v1.35
+  platformName: "<PLACEHOLDER: Your Platform Name>"
+  platformVersion: "<PLACEHOLDER: e.g., v1.0.0>"
+  vendorName: "<PLACEHOLDER: Your Organization Name>"
+  website_url: "<PLACEHOLDER: https://your-platform.example.com>"
+  repo_url: "https://github.com/<your-org>/kubernetes-ai-conformance"
+  documentation_url: "https://github.com/<your-org>/kubernetes-ai-conformance/tree/main/docs"
+  product_logo_url: "<PLACEHOLDER: https://your-cdn.example.com/logo.svg>"
+  description: "Kubernetes-based AI/MLOps platform with GPU acceleration support for distributed training and inference workloads."
+  contact_email_address: "<PLACEHOLDER: conformance@your-org.example.com>"
+
+spec:
+  accelerators:
+    - id: dra_support
+      description: "Support Dynamic Resource Allocation (DRA) APIs to enable more flexible and fine-grained resource requests beyond simple counts."
+      level: MUST
+      status: "Implemented"
+      evidence:
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/architecture.md#6-dynamic-resource-allocation-dra"
+      notes: "DRA APIs enabled via Kubernetes feature gates. ResourceClaims used for GPU allocation."
+
+  networking:
+    - id: ai_inference
+      description: "Support the Kubernetes Gateway API with an implementation for advanced traffic management for inference services, which enables capabilities like weighted traffic splitting, header-based routing (for OpenAI protocol headers), and optional integration with service meshes."
+      level: MUST
+      status: "Implemented"
+      evidence:
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/gateway-api.md"
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/examples/inference-gateway/"
+      notes: "Gateway API v1.1.0 installed with HTTPRoute support for weighted traffic splitting and header-based routing."
+
+  schedulingOrchestration:
+    - id: gang_scheduling
+      description: "The platform must allow for the installation and successful operation of at least one gang scheduling solution that ensures all-or-nothing scheduling for distributed AI workloads (e.g. Kueue, Volcano, etc.)"
+      level: MUST
+      status: "Implemented"
+      evidence:
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/scheduling.md"
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/manifests/volcano/"
+      notes: "Volcano scheduler deployed for gang scheduling of distributed AI workloads."
+
+    - id: cluster_autoscaling
+      description: "If the platform provides a cluster autoscaler or an equivalent mechanism, it must be able to scale up/down node groups containing specific accelerator types based on pending pods requesting those accelerators."
+      level: MUST
+      status: "N/A"
+      evidence: []
+      notes: "Platform does not provide cluster autoscaling. GPU nodes are statically provisioned bare-metal nodes (NVIDIA RTX 5090, RTX 4090)."
+
+    - id: pod_autoscaling
+      description: "If the platform supports the HorizontalPodAutoscaler, it must function correctly for pods utilizing accelerators. This includes the ability to scale these Pods based on custom metrics relevant to AI/ML workloads."
+      level: MUST
+      status: "N/A"
+      evidence: []
+      notes: "HPA for AI workloads is not provided in the current platform scope. Standard metrics-server is available for basic HPA."
+
+  observability:
+    - id: accelerator_metrics
+      description: "For supported accelerator types, the platform must allow for the installation and successful operation of at least one accelerator metrics solution that exposes fine-grained performance metrics via a standardized, machine-readable metrics endpoint."
+      level: MUST
+      status: "Implemented"
+      evidence:
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/monitoring.md"
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/manifests/prometheus/"
+      notes: "NVIDIA DCGM Exporter deployed for GPU metrics. Prometheus scrapes GPU utilization, memory usage, and temperature metrics."
+
+    - id: ai_service_metrics
+      description: "Provide a monitoring system capable of discovering and collecting metrics from workloads that expose them in a standard format (e.g. Prometheus exposition format)."
+      level: MUST
+      status: "Implemented"
+      evidence:
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/monitoring.md"
+      notes: "Prometheus Operator deployed with ServiceMonitor support for AI workload metrics discovery."
+
+  security:
+    - id: secure_accelerator_access
+      description: "Ensure that access to accelerators from within containers is properly isolated and mediated by the Kubernetes resource management framework (device plugin or DRA) and container runtime, preventing unauthorized access or interference between workloads."
+      level: MUST
+      status: "Implemented"
+      evidence:
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/gpu.md"
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/architecture.md#13-accelerator-isolation"
+      notes: "GPU access controlled via NVIDIA device plugin (v0.18.1) and containerd runtime isolation. No direct host GPU access permitted."
+
+  operator:
+    - id: robust_controller
+      description: "The platform must prove that at least one complex AI operator with a CRD (e.g., Ray, Kubeflow) can be installed and functions reliably. This includes verifying that the operator's pods run correctly, its webhooks are operational, and its custom resources can be reconciled."
+      level: MUST
+      status: "Implemented"
+      evidence:
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/docs/architecture.md#14-complex-ai-operator-validation"
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/manifests/ray/"
+        - "https://github.com/<your-org>/kubernetes-ai-conformance/blob/main/examples/ray-gpu-job/"
+      notes: "KubeRay Operator (v0.9.0) installed with CRDs, controller pods, and webhooks verified. RayCluster and RayJob resources reconcile successfully."
