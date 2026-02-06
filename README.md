@@ -16,6 +16,7 @@ A Kubernetes-based AI/MLOps platform designed for:
 |------|-----|------|
 | Node 1 | NVIDIA RTX 5090 | GPU Worker |
 | Node 2 | NVIDIA RTX 4090 | GPU Worker |
+| Node 3 | NVIDIA RTX 6000 Pro | GPU Worker |
 
 **Kubernetes Version**: v1.34.1
 
@@ -94,7 +95,7 @@ kubectl logs gpu-test
 | Gateway API | ✅ Pass |
 | Accelerator Metrics | ✅ Pass |
 | Dynamic Resource Allocation | ✅ Pass |
-| Cluster Autoscaling | N/A |
+| Cluster Autoscaling | ✅ Pass |
 | HPA for AI Workloads |  ✅ Pass |
 
 ## License
