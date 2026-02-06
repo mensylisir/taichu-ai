@@ -1,5 +1,5 @@
 # CNCF Kubernetes AI Conformance Submission
-# Kubernetes Version: v1.35
+# Kubernetes Version: v1.34
 
 metadata:
   kubernetesVersion: v1.34

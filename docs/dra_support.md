@@ -59,56 +59,6 @@ nvidia-operator-validator-tbfj8                               1/1     Running   
 
 ```
 
-3. Create configmap
-
-```
-kubectl apply -n gpu-operator -f - <<eof
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: device-plugin-config
-  namespace: gpu-operator
-data:
-  config.yaml: |-
-    version: v1
-    sharing:
-      timeSlicing:
-        resources:
-        - name: nvidia.com/gpu
-          replicas: 4
-eof
-```
-
-4. Patch the clusterpolicy
-
-```
-kubectl patch clusterpolicy cluster-policy \
-    --type merge \
-    -p '{"spec": {"devicePlugin": {"config": {"name": "device-plugin-config", "default": "config.yaml"}}}}'
-```
-
-5. Verify node resources
-
-```
-Capacity:
-  cpu:                20
-  ephemeral-storage:  958827632Ki
-  hugepages-1Gi:      0
-  hugepages-2Mi:      0
-  memory:             65579888Ki
-  nvidia.com/gpu:     4
-  pods:               110
-Allocatable:
-  cpu:                20
-  ephemeral-storage:  883655544189
-  hugepages-1Gi:      0
-  hugepages-2Mi:      0
-  memory:             65272688Ki
-  nvidia.com/gpu:     4
-  pods:               110
-
-```
-
 ## Install NVIDIA DRA driver
 ```bash
 helm install nvidia-dra-driver-gpu oci://ghcr.io/nvidia/k8s-dra-driver-gpu --version 25.8.0-dev-13a73595-chart -n k8s-dra-driver-gpu --create-namespace
@@ -173,41 +123,4 @@ spec:
       resourceClaims:
         - name: single-gpu
           resourceClaimTemplateName: gpu-claim-template
-```
-
-## Ensure that access to accelerators from within containers is properly isolated.
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: gpu-pod
-spec:
-  nodeName: ai18
-  containers:
-  - name: cuda
-    image: nvidia/cuda:12.0-base
-    command: ["sleep", "3600"]
-    resourceClaims:
-    - name: gpu
-  resourceClaims:
-  - name: gpu
-    resourceClaimName: claim-a
-```
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: no-gpu-pod
-spec:
-  nodeName: ai18
-  containers:
-  - name: alpine
-    image: alpine
-    command: ["sleep", "3600"]
-```
-
-```
-kubectl exec gpu-pod -- nvidia-smi -L
-kubectl exec no-gpu-pod -- ls /dev/nvidia0
 ```

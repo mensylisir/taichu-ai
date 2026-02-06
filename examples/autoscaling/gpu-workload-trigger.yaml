@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-workload
+  labels:
+    app: pytorch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pytorch
+  template:
+    metadata:
+      labels:
+        app: pytorch
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: purpose
+                operator: In
+                values:
+                - gpu
+      restartPolicy: Always
+      containers:
+        - args:
+          - while true; do sleep 30; done;
+          command:
+          - /bin/bash
+          - -c
+          - --
+          name: pytorch
+          image: nvcr.io/nvidia/pytorch:25.09-py3
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "2"
+              memory: 5Gi
+              nvidia.com/gpu: 1
+            requests:
+              cpu: "2"
+              memory: 5Gi
+              nvidia.com/gpu: 1
