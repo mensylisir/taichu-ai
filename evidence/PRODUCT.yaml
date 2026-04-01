@@ -44,7 +44,7 @@ spec:
     - id: cluster_autoscaling
       description: "If the platform provides a cluster autoscaler or an equivalent mechanism, it must be able to scale up/down node groups containing specific accelerator types based on pending pods requesting those accelerators."
       level: MUST
-      status: "N/A"
+      status: "Implemented"
       evidence:
         - "https://github.com/mensylisir/taichu-ai/blob/master/docs/cluster_autoscaling.md"
       notes: ""

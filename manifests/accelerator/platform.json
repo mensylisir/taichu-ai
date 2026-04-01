@@ -1,0 +1,294 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "datasource", "uid": "grafana" },
+        "enable": true,
+        "hide": true,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "━━━ 核心状态概览 (CORE STATUS) ━━━",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "none", "color": { "mode": "thresholds" } }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 100,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "expr": "count(dcgm_gpu_temp{Hostname=~\"$instance\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "在线 GPU 数量",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "celsius" } },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 101,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "expr": "avg by (Hostname) (dcgm_gpu_temp{Hostname=~\"$instance\"})",
+          "legendFormat": "{{Hostname}}",
+          "refId": "A"
+        }
+      ],
+      "title": "平均温度",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "watt" } },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 102,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "expr": "sum by (Hostname) (dcgm_power_usage{Hostname=~\"$instance\"})",
+          "legendFormat": "{{Hostname}} Total",
+          "refId": "A"
+        }
+      ],
+      "title": "整机功耗",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percent" } },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+      "id": 103,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "expr": "avg by (Hostname) (dcgm_gpu_utilization{Hostname=~\"$instance\"} or (dcgm_fi_prof_gr_engine_active{Hostname=~\"$instance\"} * 100))",
+          "legendFormat": "{{Hostname}}",
+          "refId": "A"
+        }
+      ],
+      "title": "全机负载率",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "id": 110,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "expr": "sum(dcgm_xid_errors{Hostname=~\"$instance\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "GPU 错误告警 (XID)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 5 },
+      "id": 111,
+      "targets": [
+        {
+          "expr": "dcgm_gpu_utilization{Hostname=~\"$instance\"} or (dcgm_fi_prof_gr_engine_active{Hostname=~\"$instance\"}*100)",
+          "refId": "A",
+          "legendFormat": "{{Hostname}} GPU{{gpu}} UTIL"
+        },
+        {
+          "expr": "(dcgm_fb_used{Hostname=~\"$instance\"} / (dcgm_fb_used{Hostname=~\"$instance\"} + dcgm_fb_free{Hostname=~\"$instance\"})) * 100",
+          "refId": "B",
+          "legendFormat": "{{Hostname}} GPU{{gpu}} MEM"
+        }
+      ],
+      "title": "实时资源表 (全节点对比)",
+      "type": "table"
+    },
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
+      "id": 2,
+      "title": "━━━ 性能深度分析 (PERFORMANCE DEPTH) ━━━",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 12 },
+      "id": 104,
+      "targets": [
+        {
+          "expr": "avg by (gpu) (dcgm_gpu_utilization{Hostname=~\"$instance\", gpu=~\"$gpu\"} or (dcgm_fi_prof_gr_engine_active{Hostname=~\"$instance\", gpu=~\"$gpu\"} * 100))",
+          "legendFormat": "核心利用率-GPU{{gpu}}",
+          "refId": "A"
+        },
+        {
+          "expr": "avg by (gpu) (dcgm_mem_copy_utilization{Hostname=~\"$instance\", gpu=~\"$gpu\"} or (dcgm_fi_prof_dram_active{Hostname=~\"$instance\", gpu=~\"$gpu\"} * 100))",
+          "legendFormat": "显存带宽-GPU{{gpu}}",
+          "refId": "B"
+        }
+      ],
+      "title": "GPU 计算 vs 显存带宽趋势",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "megabytes" } },
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 12 },
+      "id": 105,
+      "targets": [
+        {
+          "expr": "avg by (gpu) (dcgm_fb_used{Hostname=~\"$instance\", gpu=~\"$gpu\"})",
+          "legendFormat": "已用 GPU{{gpu}}",
+          "refId": "A"
+        },
+        {
+          "expr": "avg by (gpu) (dcgm_fb_used{Hostname=~\"$instance\", gpu=~\"$gpu\"} + dcgm_fb_free{Hostname=~\"$instance\", gpu=~\"$gpu\"})",
+          "legendFormat": "总量 GPU{{gpu}}",
+          "refId": "B"
+        }
+      ],
+      "title": "VRAM 显存历史堆叠",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit" } },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 19 },
+      "id": 107,
+      "targets": [
+        {
+          "expr": "avg by (gpu) (dcgm_fi_prof_pipe_tensor_active{Hostname=~\"$instance\", gpu=~\"$gpu\"})",
+          "legendFormat": "GPU{{gpu}} Tensor",
+          "refId": "A"
+        }
+      ],
+      "title": "AI Tensor Core 激活率",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "mhz" } },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 19 },
+      "id": 106,
+      "targets": [
+        {
+          "expr": "avg by (gpu) (dcgm_sm_clock{Hostname=~\"$instance\", gpu=~\"$gpu\"})",
+          "legendFormat": "SM GPU{{gpu}}",
+          "refId": "A"
+        }
+      ],
+      "title": "频率监控 (防止降频)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "decbytes" } },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 19 },
+      "id": 109,
+      "targets": [
+        {
+          "expr": "irate(dcgm_fi_prof_pcie_tx_bytes{Hostname=~\"$instance\", gpu=~\"$gpu\"}[2m])",
+          "legendFormat": "PCIe TX {{gpu}}",
+          "refId": "A"
+        },
+        {
+          "expr": "irate(dcgm_fi_prof_pcie_rx_bytes{Hostname=~\"$instance\", gpu=~\"$gpu\"}[2m])",
+          "legendFormat": "PCIe RX {{gpu}}",
+          "refId": "B"
+        }
+      ],
+      "title": "PCIe 实时吞吐 (带宽压力分析)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+      "id": 3,
+      "title": "━━━ 硬件健康监控 (HARDWARE HEALTH) ━━━",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "celsius" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
+      "id": 112,
+      "targets": [
+        {
+          "expr": "dcgm_gpu_temp{Hostname=~\"$instance\", gpu=~\"$gpu\"}",
+          "legendFormat": "GPU{{gpu}} Temp",
+          "refId": "A"
+        }
+      ],
+      "title": "温度历史曲线",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "watt" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
+      "id": 113,
+      "targets": [
+        {
+          "expr": "dcgm_power_usage{Hostname=~\"$instance\", gpu=~\"$gpu\"}",
+          "legendFormat": "GPU{{gpu}} Power",
+          "refId": "A"
+        }
+      ],
+      "title": "功率消耗历史曲线",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 42,
+  "templating": {
+    "list": [
+      {
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(dcgm_gpu_temp, Hostname)",
+        "name": "instance",
+        "query": "label_values(dcgm_gpu_temp, Hostname)",
+        "refresh": 1,
+        "type": "query",
+        "multi": true,
+        "includeAll": true
+      },
+      {
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(dcgm_gpu_temp{Hostname=~\"$instance\"}, gpu)",
+        "includeAll": true,
+        "multi": true,
+        "name": "gpu",
+        "query": "label_values(dcgm_gpu_temp{Hostname=~\"$instance\"}, gpu)",
+        "refresh": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "title": "GPU DataCenter - 全能超级面板",
+  "uid": "gpu-super-center"
+}
