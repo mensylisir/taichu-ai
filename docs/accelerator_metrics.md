@@ -68,4 +68,4 @@ Monitoring trends over time rather than single snapshots is critical. Comparing 
 
 This dashboard enables **platform administrators and developers** to monitor GPU health, utilization, and memory usage in real time, facilitating performance tuning and workload optimization on Taichu.
 
-![image-20260120104705200](../examples/accelerator/image-20260120104705200.png)
+![image-20260120104705200](../examples/accelerator/image-E017F2967A40.png)
